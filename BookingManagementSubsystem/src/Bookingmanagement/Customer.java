@@ -71,4 +71,17 @@ public class Customer {
     public void setStatus(boolean status) {
         this.status = status;
     }
+
+    @Override
+    public String toString() {
+        return "Customer{" +
+               "no=" + no +
+               ", name='" + name + '\'' +
+               ", bookingno='" + bookingno + '\'' +
+               ", type=" + type +
+               ", ld=" + ld +
+               ", d=" + d +
+               ", status=" + status +
+               '}';
+    }
 }

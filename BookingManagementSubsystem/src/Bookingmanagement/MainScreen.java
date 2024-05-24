@@ -21,7 +21,7 @@ public class MainScreen implements Serializable {
 
         // Initialization of rooms and other entities
         initializeRooms(ly, dx, sdx);
-        initializeCustomers(c);
+        initializeCustomers(c, in);
         initializeServices(l, t);
         
         Scanner in = new Scanner(System.in);
@@ -41,7 +41,7 @@ public class MainScreen implements Serializable {
             
             switch (ch) {
                 case 'b':
-                    handleBooking(ly, dx, sdx, c, b, t, l, ic);
+                    handleBooking(ly, dx, sdx, c, b, t, l, ic, in);
                     ic++;
                     break;
                 case 's':
@@ -66,104 +66,146 @@ public class MainScreen implements Serializable {
 
     private static void handleCancellation(Luxury[] ly, Deluxe[] dx, SuperDeluxe[] sdx, Scanner in) {
         System.out.println("Enter room ID to cancel:");
-        int roomId = in.nextInt();
-        // Assuming cancellation logic
-        System.out.println("Room booking cancelled.");
+        int roomId = in.nextInt() - 1;
+        if (roomId >= 0 && roomId < ly.length && ly[roomId].getStatus()) {
+            ly[roomId].setStatus(false);
+            System.out.println("Room booking cancelled.");
+        } else {
+            System.out.println("Invalid room ID or room not booked.");
+        }
     }
 
     private static void handleService(Customer[] c, Transportation[][][] t, Laundry[][][] l, Scanner in) {
         System.out.println("Enter customer ID for service:");
-        int id = in.nextInt();
-        // Assuming service booking logic
-        System.out.println("Service booked for customer " + c[id].getName());
+        int id = in.nextInt() - 1;  // Assuming customer ID starts at 1
+        if (id >= 0 && id < c.length) {
+            System.out.println("Service booked for customer " + c[id].getName());
+        } else {
+            System.out.println("Invalid customer ID.");
+        }
     }
 
-	private static void handleBooking(Luxury[] ly, Deluxe[] dx, SuperDeluxe[] sdx, Customer[] c, Book[] b, Transportation[][][] t, Laundry[][][] l, int ic) {
-	    Scanner in = new Scanner(System.in);
-	    System.out.println("Select room type (1-Luxury, 2-Deluxe, 3-SuperDeluxe): ");
-	    int choice = in.nextInt();
-	    switch (choice) {
-	        case 1:
-	            // Assuming availability check and booking logic
-	            break;
-	        case 2:
-	            // Assuming availability check and booking logic
-	            break;
-	        case 3:
-	            // Assuming availability check and booking logic
-	            break;
-	    }
-	    System.out.println("Room booked successfully for customer " + c[ic].getName());
-	    // Increment the customer counter elsewhere or consider the design
-	}
-
-	private static void initializeRooms(Luxury[] ly, Deluxe[] dx, SuperDeluxe[] sdx) {
-	    for (int i = 0; i < ly.length; i++) {
-	        ly[i] = new Luxury();
-	        ly[i].set(500, true, false);  // Set parameters as rate, wifi, status
-	    }
-	    for (int i = 0; i < dx.length; i++) {
-	        dx[i] = new Deluxe();
-	        dx[i].set(300, true, false);
-	    }
-	    for (int i = 0; i < sdx.length; i++) {
-	        sdx[i] = new SuperDeluxe();
-	        sdx[i].set(800, true, false);
-	    }
-	}
-
-
-	private static void initializeServices(Laundry[][][] l, Transportation[][][] t) {
-	    for (int i = 0; i < l.length; i++) {
-	        for (int j = 0; j < l[i].length; j++) {
-	            for (int k = 0; k < l[i][j].length; k++) {
-	                l[i][j][k] = new Laundry();
-	                t[i][j][k] = new Transportation();
-	            }
-	        }
-	    }
-	}
-
-
-	private static void initializeCustomers(Customer[] c) {
-	    for (int i = 0; i < c.length; i++) {
-	        c[i] = new Customer();
-	    }
-	}
-
-	private static void administrate(Administration admin, Luxury[] ly, Deluxe[] dx, SuperDeluxe[] sdx, Scanner in) {
-        System.out.println("Administration Menu:");
-        System.out.println("1. Enable a room");
-        System.out.println("2. Disable a room");
-        System.out.println("3. Update room fare");
-        
+    private static void handleBooking(Luxury[] ly, Deluxe[] dx, SuperDeluxe[] sdx, Customer[] c, Book[] b, Transportation[][][] t, Laundry[][][] l, int ic, Scanner in) {
+        System.out.println("Select room type (1-Luxury, 2-Deluxe, 3-SuperDeluxe): ");
         int choice = in.nextInt();
-        int roomId;
-        double fare;
-        
+        boolean roomBooked = false;
+        if (ic >= c.length || c[ic].getName() == null || c[ic].getName().isEmpty()) {
+            System.out.println("No customer information available. Please check customer initialization.");
+            return;
+        }
         switch (choice) {
             case 1:
-                System.out.println("Enter room ID to enable:");
-                roomId = in.nextInt();
-                // Assuming handling enable for Luxury only for example
-                admin.enableRoom(ly, roomId);
+                for (Luxury room : ly) {
+                    if (!room.getStatus()) {
+                        room.setStatus(true);
+                        roomBooked = true;
+                        System.out.println("Luxury room booked successfully for customer " + c[ic].getName());
+                        break;
+                    }
+                }
+                if (!roomBooked) System.out.println("No available luxury rooms.");
                 break;
             case 2:
-                System.out.println("Enter room ID to disable:");
-                roomId = in.nextInt();
-                // Assuming handling disable for Luxury only for example
-                admin.disableRoom(ly, roomId);
+                for (Deluxe room : dx) {
+                    if (!room.getStatus()) {
+                        room.setStatus(true);
+                        roomBooked = true;
+                        System.out.println("Deluxe room booked successfully for customer " + c[ic].getName());
+                        break;
+                    }
+                }
+                if (!roomBooked) System.out.println("No available deluxe rooms.");
                 break;
             case 3:
-                System.out.println("Enter room ID and new fare:");
-                roomId = in.nextInt();
-                fare = in.nextDouble();
-                // Assuming updating fare for Luxury only for example
-                admin.updateRoomFare(ly, roomId, fare);
+                for (SuperDeluxe room : sdx) {
+                    if (!room.getStatus()) {
+                        room.setStatus(true);
+                        roomBooked = true;
+                        System.out.println("Super Deluxe room booked successfully for customer " + c[ic].getName());
+                        break;
+                    }
+                }
+                if (!roomBooked) System.out.println("No available super deluxe rooms.");
                 break;
         }
     }
 
-    // Assuming existence of methods for handleBooking, handleService, handleCancellation
-    // Add here the implementations of handleBooking, handleService, handleCancellation
+
+    private static void initializeRooms(Luxury[] ly, Deluxe[] dx, SuperDeluxe[] sdx) {
+        for (int i = 0; i < ly.length; i++) {
+            ly[i] = new Luxury();
+            ly[i].set(500, true, false);  // Set parameters as rate, wifi, status
+        }
+        for (int i = 0; i < dx.length; i++) {
+            dx[i] = new Deluxe();
+            dx[i].set(300, true, false);
+        }
+        for (int i = 0; i < sdx.length; i++) {
+            sdx[i] = new SuperDeluxe();
+            sdx[i].set(800, true, false);
+        }
+    }
+
+    private static void initializeServices(Laundry[][][] l, Transportation[][][] t) {
+        for (int i = 0; i < l.length; i++) {
+            for (int j = 0; j < l[i].length; j++) {
+                for (int k = 0; k < l[i][j].length; k++) {
+                    l[i][j][k] = new Laundry();
+                    t[i][j][k] = new Transportation();
+                }
+            }
+        }
+    }
+
+    private static void initializeCustomers(Customer[] c, Scanner in) {
+        for (int i = 0; i < c.length; i++) {
+            c[i] = new Customer();
+            System.out.println("Initializing customer ID " + (i + 1));
+            c[i].setInitialDetails(i, in);  // You need to ensure that this method prompts for and reads the customer's name and other details
+        }
+    }
+
+
+
+    private static void administrate(Administration admin, Luxury[] ly, Deluxe[] dx, SuperDeluxe[] sdx, Scanner in) {
+        System.out.println("Administration Menu:");
+        System.out.println("1. Enable a room");
+        System.out.println("2. Disable a room");
+        System.out.println("3. Update room fare");
+        System.out.println("Enter your choice:");
+        
+        int choice = in.nextInt();  // Get user choice for administration action
+
+        if (choice == 1 || choice == 2 || choice == 3) {
+            System.out.println("Enter room ID:");
+            int roomId = in.nextInt() - 1;  // Assume room IDs start at 1
+
+            if (choice == 1) {
+                if (roomId >= 0 && roomId < ly.length) {
+                    ly[roomId].setStatus(true);
+                    System.out.println("Luxury room " + (roomId + 1) + " enabled.");
+                } else {
+                    System.out.println("Invalid room ID.");
+                }
+            } else if (choice == 2) {
+                if (roomId >= 0 && roomId < ly.length) {
+                    ly[roomId].setStatus(false);
+                    System.out.println("Luxury room " + (roomId + 1) + " disabled.");
+                } else {
+                    System.out.println("Invalid room ID.");
+                }
+            } else if (choice == 3) {
+                System.out.println("Enter new fare:");
+                double fare = in.nextDouble();
+                if (roomId >= 0 && roomId < ly.length) {
+                    ly[roomId].setFare(fare);
+                    System.out.println("Fare for luxury room " + (roomId + 1) + " updated to " + fare);
+                } else {
+                    System.out.println("Invalid room ID.");
+                }
+            }
+        } else {
+            System.out.println("Invalid option selected.");
+        }
+    }
 }
