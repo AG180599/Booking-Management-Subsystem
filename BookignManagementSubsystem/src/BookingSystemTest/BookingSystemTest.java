@@ -1,3 +1,4 @@
+// This is BookingSystemTest package
 package BookingSystemTest;
 
 import org.junit.*;
