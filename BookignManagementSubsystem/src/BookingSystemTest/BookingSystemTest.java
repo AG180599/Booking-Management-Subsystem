@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 
 public class BookingSystemTest {
     private BookingSystem bookingSystem;
-
+// this is before annotation that you have used you know
     @Before
     public void setUp() {
         bookingSystem = BookingSystem.getInstance();
